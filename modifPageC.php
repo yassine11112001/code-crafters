@@ -1,26 +1,10 @@
 <?php
-include '../controller/produitC.php';
 include '../controller/categorieC.php';
+include '../config.php';
 
-$produitsC = new produitsC();
-
-$listproduit = $produitsC->afficherProduit();
-
-if(isset($_POST["type"]))
-{
-if($_POST["type"] == "Tri"){
-  $listproduit = $produitsC->afficherProduittri();
-}
-else if($_POST["type"] == "search"){
-  $listproduit = $produitsC->afficherProduitRecherche($_POST["search"]);
-}
-else if($_POST["type"] == "Tous"){
-$listproduit = $produitsC->afficherProduit();
-}
-}
 $categoriesC = new categoriesC();
-$listcategories = $categoriesC->afficherCat();
-$listcategoriesA = $categoriesC->afficherCat();
+$id_cat = $_GET["id_cat"];
+$categories = $categoriesC->recupererCat($id_cat);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -157,9 +141,9 @@ $listcategoriesA = $categoriesC->afficherCat();
 
             <!-- Nav Item - Tables -->
             <li class="nav-item active">
-                <a class="nav-link" href="trajetAdmin.php">
+                <a class="nav-link" href="affichageClient.php">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Trajet</span></a>
+                    <span>Categories</span></a>
             </li>
 
             <!-- Divider -->
@@ -388,160 +372,23 @@ $listcategoriesA = $categoriesC->afficherCat();
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Tables</h1>
-                    <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below.
-                        For more information about DataTables, please visit the <a target="_blank"
-                            href="https://datatables.net">official DataTables documentation</a>.</p>
-
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Listes Des Catégories</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Listes Des Catégories : Page de Modification</h6>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Nom</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            <?php
-                            foreach ($listcategories as $categories) {
-                            ?>
-                                        <tr>
-                                            <td><?php echo $categories['id_cat']; ?></td>
-                                            <td><?php echo $categories['nom_cat']; ?></td>
-                                            <td>
-                                    <td>
-                                    <a href="joinProduit.php?id_cat=<?php echo $categories['id_cat']; ?>" class="btn btn-primary mr-2">Voir Produits</a>
-                                    <a href="modifPageC.php?id_cat=<?php echo $categories['id_cat']; ?>" class="btn btn-primary mr-2">Modifier</a>                             
-                                    <a href="supprimerC.php?id_cat=<?php echo $categories['id_cat']; ?>" class="btn btn-primary mr-2">Supprimer</a>
-                                    </td>
-                                        </tr>
-                            <?php
-                            }
-                            ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Listes Des Produits</h6>
-                        </div>
-                        <form action="" method="POST">
-                        <input type="submit" class="btn btn-primary mr-2" name="type" value="Tri">
-                      </form>
-                      <form action="" method="POST">
-                        <input type="submit" class="btn btn-primary mr-2" name="type" value="Tous">
-                      </form>
-                      <form action="" method="POST" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                        <input type="text" class="form-control" placeholder="Search products" name="search" id="search">
-                        <input type="submit" class="btn btn-primary mr-2" name="type" value="search">
-                      </form>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Nom</th>
-                                            <th>Prix</th>
-                                            <th>Description</th>
-                                            <th>ID Catégorie</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            <?php
-                            foreach ($listproduit as $produits) {
-                            ?>
-                                        <tr>
-                                            <td><?php echo $produits['nom']; ?></td>
-                                            <td><?php echo $produits['prix']; ?></td>
-                                            <td><?php echo $produits['description']; ?></td>
-                                            <td><?php echo $produits['id_cat']; ?></td>
-                                            <td>
-                                    <td>
-                                    <a href="modifPage.php?id=<?php echo $produits['id']; ?>" class="btn btn-primary mr-2">Modifier</a>                             
-                                    <a href="supprimer.php?id=<?php echo $produits['id']; ?>" class="btn btn-primary mr-2">Supprimer</a>
-                                    </td>
-                                        </tr>
-                            <?php
-                            }
-                            ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card shadow mb-4">
-                    <form method="POST" action="ajoutProduit.php" id="myForm1" class="myForm">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Ajouter Une Catégorie</h6>
-                        </div>
-                        <label for="nomC">Nom :</label>
-                        <input type="text" id="nomC" name="nom_cat" >
-                        <span id="errornomC"></span>
-                        
-                        <input type="submit" value="Ajouter">
-                      </form>
-                    </div>
-                    <script> 
-                     // cntrl de saisie
-                     let myFormm = document.getElementById('myForm1');
-                    
-                    myFormm.addEventListener('submit' , function(e){
-                      let mynomm = document.getElementById('nomC');
 
-                      if(mynomm.value=='')
-                      {
-                        let error = document.getElementById('errornomC');
-                        error.innerHTML = "Le champs Nom est requis";
-                        error.style.color = 'red';
-                        e.preventDefault();
-                      }
-
-                    
-                    });
-                    </script>
-                    
-
-                </div>
                     <div class="card shadow mb-4">
-                    <form method="POST" action="ajoutProduit.php" id="myForm" class="myForm">
+                    <form method="POST" action="modifFunction.php?id=<?php echo $categories['id_cat']; ?>" id="myForm" class="myForm">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Ajouter Un Produit</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Modifier Un Produit</h6>
                         </div>
-                        <label for="nom">Nom :</label>
-                        <input type="text" id="nom" name="nom" >
+                        <label for="nom_cat">Nom :</label>
+                        <input type="text" id="nom_cat" name="nom_cat" value="<?php echo $categories['nom_cat']; ?>">
                         <span id="errornom"></span>
-                        
-                        <label for="prix">Prix:</label>
-                        <input type="text" id="prix" name="prix" >
-                        <span id="errorprix"></span>
-
-                        <label for="description">Description :</label>
-		                <textarea type="text" id="description" name="description"></textarea>
-                        <span id="errordescription"></span>
-
-                        <label for="id_cat">Nom Categorie :</label>
-                        <br>
-                        <select name="id_cat" >
-                        <?php
-                            foreach ($listcategoriesA as $categories) {
-                            ?>
-                         <option value="<?php echo $categories['id_cat']; ?>"><?php echo $categories['nom_cat']; ?></option>
-                         <?php
-                            }
-                            ?>   
-                        </select> 
-                        <br>
-                        <br>
-                        <input type="submit" value="Ajouter">
+      
+                        <input type="submit" value="Modifier">
+                        <a href="affichageClient.php" class="btn-annul">Annuler</a>
                       </form>
                     </div>
                     <script> 
@@ -549,8 +396,7 @@ $listcategoriesA = $categoriesC->afficherCat();
                      let myForm = document.getElementById('myForm');
                     
                     myForm.addEventListener('submit' , function(e){
-                      let mynom = document.getElementById('nom');
-                      let mydescription = document.getElementById('description');
+                      let mynom = document.getElementById('nom_cat');
 
                       if(mynom.value=='')
                       {
@@ -559,18 +405,11 @@ $listcategoriesA = $categoriesC->afficherCat();
                         error.style.color = 'red';
                         e.preventDefault();
                       }
-                      if(mydescription.value=='')
-                      {
-                        let error = document.getElementById('errordescription');
-                        error.innerHTML = "Le champs ville arrivée est requis";
-                        error.style.color = 'red';
-                        e.preventDefault();
-                      }
+
 
                     
                     });
                     </script>
-                    
 
                 </div>
                 <!-- /.container-fluid -->
@@ -627,14 +466,14 @@ $listcategoriesA = $categoriesC->afficherCat();
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="jsB/sb-admin-2.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
 
     <!-- Page level plugins -->
     <script src="vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="jsB/demo/datatables-demo.js"></script>
+    <script src="js/demo/datatables-demo.js"></script>
 
 </body>
 

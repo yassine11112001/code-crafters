@@ -1,26 +1,9 @@
 <?php
 include '../controller/produitC.php';
-include '../controller/categorieC.php';
 
 $produitsC = new produitsC();
-
-$listproduit = $produitsC->afficherProduit();
-
-if(isset($_POST["type"]))
-{
-if($_POST["type"] == "Tri"){
-  $listproduit = $produitsC->afficherProduittri();
-}
-else if($_POST["type"] == "search"){
-  $listproduit = $produitsC->afficherProduitRecherche($_POST["search"]);
-}
-else if($_POST["type"] == "Tous"){
-$listproduit = $produitsC->afficherProduit();
-}
-}
-$categoriesC = new categoriesC();
-$listcategories = $categoriesC->afficherCat();
-$listcategoriesA = $categoriesC->afficherCat();
+$id = $_GET["id_cat"];
+$listproduit = $produitsC->joinProduit($id);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -397,53 +380,8 @@ $listcategoriesA = $categoriesC->afficherCat();
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Listes Des Catégories</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Listes Des Produits :</h6>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Nom</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            <?php
-                            foreach ($listcategories as $categories) {
-                            ?>
-                                        <tr>
-                                            <td><?php echo $categories['id_cat']; ?></td>
-                                            <td><?php echo $categories['nom_cat']; ?></td>
-                                            <td>
-                                    <td>
-                                    <a href="joinProduit.php?id_cat=<?php echo $categories['id_cat']; ?>" class="btn btn-primary mr-2">Voir Produits</a>
-                                    <a href="modifPageC.php?id_cat=<?php echo $categories['id_cat']; ?>" class="btn btn-primary mr-2">Modifier</a>                             
-                                    <a href="supprimerC.php?id_cat=<?php echo $categories['id_cat']; ?>" class="btn btn-primary mr-2">Supprimer</a>
-                                    </td>
-                                        </tr>
-                            <?php
-                            }
-                            ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Listes Des Produits</h6>
-                        </div>
-                        <form action="" method="POST">
-                        <input type="submit" class="btn btn-primary mr-2" name="type" value="Tri">
-                      </form>
-                      <form action="" method="POST">
-                        <input type="submit" class="btn btn-primary mr-2" name="type" value="Tous">
-                      </form>
-                      <form action="" method="POST" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                        <input type="text" class="form-control" placeholder="Search products" name="search" id="search">
-                        <input type="submit" class="btn btn-primary mr-2" name="type" value="search">
-                      </form>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -464,11 +402,7 @@ $listcategoriesA = $categoriesC->afficherCat();
                                             <td><?php echo $produits['prix']; ?></td>
                                             <td><?php echo $produits['description']; ?></td>
                                             <td><?php echo $produits['id_cat']; ?></td>
-                                            <td>
-                                    <td>
-                                    <a href="modifPage.php?id=<?php echo $produits['id']; ?>" class="btn btn-primary mr-2">Modifier</a>                             
-                                    <a href="supprimer.php?id=<?php echo $produits['id']; ?>" class="btn btn-primary mr-2">Supprimer</a>
-                                    </td>
+
                                         </tr>
                             <?php
                             }
@@ -478,101 +412,8 @@ $listcategoriesA = $categoriesC->afficherCat();
                             </div>
                         </div>
                     </div>
-                    <div class="card shadow mb-4">
-                    <form method="POST" action="ajoutProduit.php" id="myForm1" class="myForm">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Ajouter Une Catégorie</h6>
-                        </div>
-                        <label for="nomC">Nom :</label>
-                        <input type="text" id="nomC" name="nom_cat" >
-                        <span id="errornomC"></span>
-                        
-                        <input type="submit" value="Ajouter">
-                      </form>
-                    </div>
-                    <script> 
-                     // cntrl de saisie
-                     let myFormm = document.getElementById('myForm1');
-                    
-                    myFormm.addEventListener('submit' , function(e){
-                      let mynomm = document.getElementById('nomC');
-
-                      if(mynomm.value=='')
-                      {
-                        let error = document.getElementById('errornomC');
-                        error.innerHTML = "Le champs Nom est requis";
-                        error.style.color = 'red';
-                        e.preventDefault();
-                      }
-
-                    
-                    });
-                    </script>
-                    
-
-                </div>
-                    <div class="card shadow mb-4">
-                    <form method="POST" action="ajoutProduit.php" id="myForm" class="myForm">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Ajouter Un Produit</h6>
-                        </div>
-                        <label for="nom">Nom :</label>
-                        <input type="text" id="nom" name="nom" >
-                        <span id="errornom"></span>
-                        
-                        <label for="prix">Prix:</label>
-                        <input type="text" id="prix" name="prix" >
-                        <span id="errorprix"></span>
-
-                        <label for="description">Description :</label>
-		                <textarea type="text" id="description" name="description"></textarea>
-                        <span id="errordescription"></span>
-
-                        <label for="id_cat">Nom Categorie :</label>
-                        <br>
-                        <select name="id_cat" >
-                        <?php
-                            foreach ($listcategoriesA as $categories) {
-                            ?>
-                         <option value="<?php echo $categories['id_cat']; ?>"><?php echo $categories['nom_cat']; ?></option>
-                         <?php
-                            }
-                            ?>   
-                        </select> 
-                        <br>
-                        <br>
-                        <input type="submit" value="Ajouter">
-                      </form>
-                    </div>
-                    <script> 
-                     // cntrl de saisie
-                     let myForm = document.getElementById('myForm');
-                    
-                    myForm.addEventListener('submit' , function(e){
-                      let mynom = document.getElementById('nom');
-                      let mydescription = document.getElementById('description');
-
-                      if(mynom.value=='')
-                      {
-                        let error = document.getElementById('errornom');
-                        error.innerHTML = "Le champs Nom est requis";
-                        error.style.color = 'red';
-                        e.preventDefault();
-                      }
-                      if(mydescription.value=='')
-                      {
-                        let error = document.getElementById('errordescription');
-                        error.innerHTML = "Le champs ville arrivée est requis";
-                        error.style.color = 'red';
-                        e.preventDefault();
-                      }
-
-                    
-                    });
-                    </script>
-                    
-
-                </div>
+                   
+                   
                 <!-- /.container-fluid -->
 
             </div>

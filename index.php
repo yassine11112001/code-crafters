@@ -1,5 +1,11 @@
+<?php
+include '../controller/categorieC.php';
+include '../config.php';
 
+$categoriesC = new categoriesC();
+$listcat = $categoriesC->afficherCat();
 
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -34,8 +40,7 @@
                         <li class="nav-item"><a class="nav-link" href="/user/view/Front/login.php">Inscription</a></li>
                         <li class="nav-item"><a class="nav-link" href="lamainverte.html">Produit</a></li>
                         <li class="nav-item"><a class="nav-link" href="lamainverte1.html">News</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/reclamation/view/front/ajout.php">Reclamation</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/reclamation/view/back/affichageClient.php">Parametres</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/user/view/Back/affichageClient.php">Parametres</a></li>
                         </div>
                         <a class="btn btn-primary py-2 px-4" href="logout.php" >Log Out</a>
                         </div>
@@ -77,48 +82,22 @@ L'objectif de ce projet est de créer une entreprise de pépinière écologique 
         </section>
         <!-- Projects-->
         <section class="projects-section bg-light" id="projects">
+            <?php
+                foreach($listcat as $categories){
+            ?>
             <div class="container px-4 px-lg-5">
                 <!-- Featured Project Row-->
                 <div class="row gx-0 mb-4 mb-lg-5 align-items-center">
                     <div class="col-xl-8 col-lg-7"><img class="img-fluid mb-3 mb-lg-0" src="assets/img/serre agricole.png" alt="..." /></div>
                     <div class="col-xl-4 col-lg-5">
                         <div class="featured-text text-center text-lg-left">
-                            <h4>Pepiniere</h4>
-                            <p class="text-black-50 mb-0">Notre pepiniere vous offre une varite de produits tel que une diversite des arbres, des plus petits comme les arbustes jusqu'aux plus grands comme les arbres d'ornement ,des Plantes vivaces ,anuelles aquatiques et des graines</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project One Row-->
-                <div class="row gx-0 mb-5 mb-lg-0 justify-content-center">
-                    <div class="col-lg-6"><img class="img-fluid" src="assets/img/aa.jpg" alt="..." /></div>
-                    <div class="col-lg-6">
-                        <div class="bg-black text-center h-100 project">
-                            <div class="d-flex h-100">
-                                <div class="project-text w-100 my-auto text-center text-lg-left">
-                                    <!-- <h4 class="text-white">Misty</h4> -->
-                                    <p class="mb-0-text-white-50">notre pepiniere propose une varite d'equipement de jardinage tel que des Brouettes ,Arrosoirs ,Pots de fleurs ecologique ,Tuyaux d'arrosage et finalement une grande diversite d'outils de jardinage tel que des pelles ,des rateaux,des seaux etc...</p>
-                                    <hr class="d-none d-lg-block mb-0 ms-0" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project Two Row-->
-                <div class="row gx-0 justify-content-center">
-                    <div class="col-lg-6"><img class="img-fluid" src="assets/img/bb.jpg" alt="..." /></div>
-                    <div class="col-lg-6 order-lg-first">
-                        <div class="bg-black text-center h-100 project">
-                            <div class="d-flex h-100">
-                                <div class="project-text w-100 my-auto text-center text-lg-right">
-                                   <!-- <h4 class="text-white">Mountains</h4> -->
-                                    <p class="mb-1-text-white-50">En somme,notre entreprise horticole  est la destination idéale pour les passionnés de jardinage soucieux de l'environnement. En proposant des produits respectueux de la nature, elle permet aux clients de cultiver un jardin sain et éco-responsable. De plus, la pépinière peut offrir des conseils avisés sur les techniques de jardinage respectueuses de l'environnement, pour aider les clients à réduire leur empreinte carbone. En tant que lieu de rencontre pour les amateurs de jardinage écoresponsables, une pépinière écologique est un espace incontournable pour toutes les personnes souhaitant créer un jardin à la fois beau, sain et durable.</p>
-                                    <hr class="d-none d-lg-block mb-0 me-0" />
-                                </div>
-                            </div>
+                            <h3><?php echo $categories['nom_cat']; ?></h3>
+                            <a href="joinFront.php?id=<?php echo $categories['id_cat']; ?>">Voir Produits</a>
                         </div>
                     </div>
                 </div>
             </div>
+            <?php } ?>
         </section>
         <!-- Signup-->
         <section class="signup-section" id="signup">
