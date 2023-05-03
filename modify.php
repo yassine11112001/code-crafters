@@ -4,18 +4,26 @@ $username = "root";
 $password = "";
 $dbname = "reclamation";
 
+try {
+  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+  // set the PDO error mode to exception
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
-$n_cmd_b = $_REQUEST['n_cmd_b'];
-$to_modify = $_REQUEST['select_liste'];
-$new_value = $_REQUEST['new_value'];
-$sql= "UPDATE reclam SET $to_modify='$new_value' WHERE n_cmd=$n_cmd_b";
-if(mysqli_query($conn, $sql)){
-            echo "<h3>YOUR RECLAMATION HAS BEEN MODIFIED SUCCESFULY</h3>.";
+  $n_cmd_b = $_REQUEST['n_cmd_b'];
+  $to_modify = $_REQUEST['select_liste'];
+  $new_value = $_REQUEST['new_value'];
+
+  $sql = "UPDATE reclam SET $to_modify=:new_value WHERE n_cmd=:n_cmd_b";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(':new_value', $new_value);
+  $stmt->bindParam(':n_cmd_b', $n_cmd_b);
+
+  if ($stmt->execute()) {
+    echo "<h3>YOUR RECLAMATION HAS BEEN MODIFIED SUCCESSFULLY</h3>";
+  }
+} catch (PDOException $e) {
+  echo "Connection failed: " . $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
@@ -26,6 +34,6 @@ if(mysqli_query($conn, $sql)){
   <title>DELETED</title>
 </head>
 <body>
-<a href="reclamation.php">GO BACK TO RECLAMATION</a>
+<a href="affichageClient.php">GO BACK TO RECLAMATION</a>
 </body>
 </html>

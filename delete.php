@@ -1,19 +1,34 @@
 <?php
-$servername = "127.0.0.1";
-$username = "root";
-$password = "";
-$dbname = "reclamation";
+$host = '127.0.0.1'; // Host name
+$db_name = 'reclamation'; // Database name
+$username = 'root'; // Database username
+$password = ''; // Database password
 
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+try {
+  $pdo = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  echo "Connected successfully!";
+} catch(PDOException $e) {
+  echo "Connection failed: " . $e->getMessage();
 }
+
 $n_cmd_a = $_REQUEST['n_cmd_a'];
-$sql = "DELETE FROM reclam WHERE n_cmd=$n_cmd_a";
-if(mysqli_query($conn, $sql)){
-            echo "<h3>YOUR RECLAMATION HAS BEEN DELETED SUCCESFULY</h3>.";
+
+// First delete related rows from the reply table
+$sql = "DELETE FROM reply WHERE n_cmd=:n_cmd_a";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':n_cmd_a', $n_cmd_a, PDO::PARAM_INT);
+$stmt->execute();
+
+// Then delete the row from the reclam table
+$sql = "DELETE FROM reclam WHERE n_cmd=:n_cmd_a";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':n_cmd_a', $n_cmd_a, PDO::PARAM_INT);
+
+if ($stmt->execute()) {
+  echo "<h3>YOUR RECLAMATION HAS BEEN DELETED SUCCESSFULLY</h3>";
+} else {
+  echo "Error deleting record: " . $stmt->errorInfo()[2];
 }
 
 ?>
