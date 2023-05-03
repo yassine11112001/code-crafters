@@ -1,28 +1,34 @@
-
 <?php
 
 include_once '../../Model/admin.php';
 include_once '../../Controller/adminC.php';
+
 $adminC = new adminC();
 $listeC = $adminC->afficherAdmin();
 
 $adminC = new adminC();
 if (
     isset($_POST["nom"]) && 
+    isset($_POST["numtel"]) && 
     isset($_POST["email"]) &&
+    isset($_POST["adresse"]) &&
     isset($_POST["mdp"]) 
 ) {
     if (
         !empty($_POST["nom"]) && 
+        !empty($_POST["numtel"]) && 
         !empty($_POST["email"]) &&
+        !empty($_POST["adresse"]) &&
         !empty($_POST["mdp"]) 
     ) {
         $admin = new admin(
             $_POST['nom'],
             $_POST['email'],
+            $_POST['numtel'],
+            $_POST['adresse'],
             $_POST['mdp']
         );
-        $adminC->ajouterAdmin($admin);
+        $adminC->ajouteradmin($admin);
         
         header('Location:affichageAdmin.php');
     }
@@ -31,11 +37,13 @@ if (
 }
 if (isset($_POST["rech"])&&isset($_POST["search"])) {
   if(!empty($_POST["rech"]))
-  $listeC = $adminC->afficherAdminRech( $_POST['rech'],$_POST['selon']);
+  $listeC = $adminC->afficheradminRech( $_POST['rech'],$_POST['selon']);
 }
-
+if (isset($_POST["tri"])) {
+if(!empty($_POST["tri"]))
+$listeC = $adminC->afficheradminTrie( $_POST['tri']);
+}
 ?>
-
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
 
@@ -73,7 +81,8 @@ body {
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>SB Admin 2 - Tables</title>
+        <title>LA MAIN VERTE</title>
+        <link rel="icon" type="image/x-icon" href="/user/view/Front/assets/favicon.ico" />
 
         <!-- Custom fonts for this template -->
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -98,7 +107,7 @@ body {
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/user/view/Front/indexadmin.php">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -142,20 +151,27 @@ body {
                     <span>Admin</span></a>
             </li>
 
-            <!-- Nav Item - Tables -->
+            <!-- Nav Item - Tables
             <li class="nav-item ">
-                <a class="nav-link" href="affichageClient.php">
+                <a class="nav-link" href="affichageAdmin.php">
                     <i class="fas fa-fw fa-table"></i>
                     <span>Clients</span></a>
-            </li>
+            </li> -->
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            <button class="rounded-circle border-0" id="sidebarToggle" onclick="redirectToPhpFile()"></button>
             </div>
+            <script>
+            function redirectToPhpFile() 
+            {
+            window.location.href = "/user/view/Front/indexadmin.php";
+            }
+            </script>
+
 
         </ul>
         <!-- End of Sidebar -->
@@ -385,18 +401,106 @@ body {
                         <div class="card-body">
                             <div class="table-responsive">
                                     <thead>
-                                    <form method="POST" action="affichageClient.php">
+             <form method="POST" action="affichageAdmin.php">
              <input type="submit" value="reset" >
+             <input type="submit" value="Voir en details" name="det"> <label>search accounts</label>
               <input type="text" class="field small-field" name="rech"/>
               <select name="selon" class="field small-field" >
               
               <option value="nom">nom</option>
               <option value="email">email</option>
-              <option value="numtel">numtel</option>
               
             </select>
-              <input type="submit" class="button" value="search" name="search" />
-          <label>Sort by</label>
+              <input type="submit" class="button" value="search" name="search" /></form>
+            </div>
+          </div>
+          
+          <!-- End Box Head -->
+          <!-- Table -->
+          <div class="table">
+          
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" >
+        
+              <tr>
+               
+                <th>ID</th>
+                <th>Nom</th>
+            
+                <th>Email</th>
+                <th>Numtel</th>
+                <th>Adresse</th>
+                <th>Mdp</th>
+                <th>Date_inscr</th>
+                <th>Date_modif</th>
+                <th>Role</th>
+              
+               
+              </tr>
+
+              
+
+              <?php
+// inclusion du fichier contenant la connexion à la base de données
+require_once("C:/xampp/htdocs/user/config.php");
+
+// connexion à la base de données
+$bdd = config::getConnexion();
+
+// requête pour sélectionner tous les clients et leurs informations associées, y compris la date d'inscription et la date de modification à partir de la table client2
+$query = "SELECT c.id, c.nom, c.email, c.numtel, c.adresse, c.mdp, c2.date_inscr, c2.date_modif, c2.role
+          FROM client c 
+          INNER JOIN client2 c2 ON c.id = c2.id";
+$listeC = $bdd->query($query);
+?>
+
+<!-- boucle sur la liste des clients pour afficher leurs informations, y compris la date d'inscription et la date de modification -->
+<?php foreach ($listeC as $admin) : ?>
+  <tr>
+    <td><?php echo $admin['id']; ?></td>
+    <td><?php echo $admin['nom']; ?></td>
+    <td><?php echo $admin['email']; ?></td>
+    <td><?php echo $admin['numtel']; ?></td>
+    <td><?php echo $admin['adresse']; ?></td>
+    <td><?php echo $admin['mdp']; ?></td>
+    <td><?php echo $admin['date_inscr']; ?></td>
+    <td><?php echo $admin['date_modif']; ?></td>
+    <td><?php echo $admin['role']; ?></td>
+    <td>
+      <a href="supprimeradmin.php?id=<?php echo $admin['id']; ?>" class="ico del">Delete</a>
+    </td>
+    <td>
+      <a href="modifierAdmin.php?id=<?php echo $admin['id']; ?>" class="ico edit">Edit</a>
+    </td>
+  </tr>
+<?php endforeach; ?>
+
+              
+              
+              
+              
+              
+              
+            
+           
+            </table>
+            <!-- End Pagging -->
+          </div>
+          <!-- Table -->
+      
+        <!-- End Box -->
+        <!-- Box -->
+        <div class="box">
+          <!-- Box Head -->
+       
+          <!-- End Box Head -->
+        
+        <!-- End Box -->
+      </div>
+      <!-- End Content -->
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <!-- Box -->  <div class="sort">
+              <form method="POST"><label>Sort by</label>
               <select name="tri" class="field" >
               
                 <option value="nom">nom</option>
@@ -405,122 +509,63 @@ body {
                 
               </select><input type="submit"  value="trier"></form>
               
-          </div>
-          </div>
-
-          <!-- End Box Head -->
-          <!-- Table -->
-          <div class="table">
-          
-          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-        
-          <tr>
-               
-               <th>ID</th>
-               <th>Nom</th>
-           
-               <th>Email</th>
-               <th>Mot de passe</th>
-             
-              
-             </tr>
-
-             
-
-             <?php
-   foreach($listeC as $admin){
-       ?>
-
-
-             <tr>
-               <td><?php echo $admin['id']; ?></td>
-               <td><?php echo $admin['nom']; ?></td>
-                
-               <td><?php echo $admin['email']; ?></td>
-               <td><?php echo $admin['mdp']; ?></td>
-              
-               <td><a href="supprimerAdmin.php?id=<?php echo $admin['id']; ?>" class="ico del">Delete</a> </td>
-               <td> <a href="modifierAdmin.php?id=<?php echo $admin['id']; ?>" class="ico edit">Edit</a>
-              
-             
-             
-             
-             </td>
-             </tr>
-             <?php } ?>
-             
-             
-             
-             
-             
-             
-           
-              
-            
-           
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- /.container-fluid -->
-
             </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-         
-            <!-- End of Footer -->
-
-        </div>
-        <!-- End of Content Wrapper -->
-
+       
+      <!-- End Sidebar -->
+      <div class="cl">&nbsp;</div>
     </div>
-    <!-- End of Page Wrapper -->
+   
+</div>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+<?php 
+include_once "../../Controller/adminC.php";
+$adminC = new adminC();
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="logout.php">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+ ?>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+// Load google charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
 
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
+// Draw the chart and set the chart values
+function drawChart() {
+    
+  var data = google.visualization.arrayToDataTable([
+   
+  [ 'role', 'nombre'],
+  
 
-    <!-- Page level plugins -->
-    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <?php
+  foreach($listeC as $k){
+   echo "["; echo "'";echo $k['email'];echo"'";echo",";echo $k['count(*)'];echo"],";}?>
 
-    <!-- Page level custom scripts -->
-    <script src="js/demo/datatables-demo.js"></script>
+
+  
+
+  
+]);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'ROLES', 'width':750, 'height':400};
+
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+  chart.draw(data, options);
+}
+</script>
+
+<!-- End Container -->
+<!-- Footer -->
+<div id="footer">
+  <div class="shell"> <span class="left">&copy; 2010 - CompanyName</span> <span class="right"> Design by <a href="http://chocotemplates.com">Chocotemplates.com</a> </span> </div>
+</div>
+<!-- End Footer -->
+
+
+
+
 
 </body>
-
 </html>

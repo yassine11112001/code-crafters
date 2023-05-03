@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="style.css" type="text/css" media="all" />
 <?php
+ob_start();
  include_once '../../Controller/clientC.php';
  
  $co = new clientC();
@@ -56,20 +57,31 @@
           <!-- End Box Head -->
             <!-- Form -->
             <div class="container">
-              <p> 
+            <form method="post" onsubmit="return validateForm();">
+            <p> 
                 <label>Nom </label>
-                <input type="text" class="form-control form-control-user" name="nom" value=<?php echo $client['nom'];?> />
+                <input class="form-control" type="text" name="nom" placeholder="Nom" onkeyup="validateNom(this)" value=<?php echo $client['nom'];?> />
+                <span id="nomError" class="error-message"></span>
+                <span id="nomTick" class="tick"></span>
               </p>
-              <p> 
-                <label>Numtel </label>
-                <input type="number" class="form-control form-control-user" name="numtel" value=<?php echo $client['numtel'];?> />
-              </p>
+              <p> </form>
+<!-- Numtel -->
+<div class="form-group">
+    <label for="numtel">Numéro de téléphone</label>
+    <div class="form-control form-control-user">
+        <span><?php echo $client['numtel']; ?></span>
+        <input type="hidden" name="numtel" value="<?php echo $client['numtel']; ?>" />
+    </div>
+</div>
 
-
-              <p> 
-                <label>Email </label>
-                <input type="email" class="form-control form-control-user" name="email" value=<?php echo $client['email'];?> />
-              </p>
+<!-- Email -->
+<div class="form-group">
+    <label for="email">Adresse email</label>
+    <div class="form-control form-control-user">
+        <span><?php echo $client['email']; ?></span>
+        <input type="hidden" name="email" value="<?php echo $client['email']; ?>" />
+    </div>
+</div>
               <p> 
                 <label>Adresse </label>
                 <input type="text" class="form-control form-control-user" name="adresse" value=<?php echo $client['adresse'];?> />
@@ -94,6 +106,63 @@
  </div>
  </div>
  </body>
+ <style>
+    .error-message {
+        color: red;
+    }
+
+    .tick:before {
+        content: "✔";
+        color: green;
+        float: right;
+        position: relative;
+        top: -28px;
+        right: -28px
+    }
+
+    .cross:before {
+        content: "✘";
+        color: red;
+        float: right;
+        position: relative;
+        top: -28px;
+        right: -28px
+    }
+</style>
+
+<script>
+      function validateForm() {
+        var valid = true;
+    function validateNom(nomInput) {
+        var nom = nomInput.value;
+        var regex_nom = /^[a-zA-Z]{4,15}(\s[a-zA-Z]{4,15})?$/;
+        if (!regex_nom.test(nom)) {
+            document.getElementById("nomError").innerHTML = "Le nom ne doit pas être vide.";
+            document.getElementById("nomTick").classList.remove("tick");
+            document.getElementById("nomTick").classList.add("cross");
+            valid = false;
+        } else {
+            document.getElementById("nomError").innerHTML = "";
+            document.getElementById("nomTick").classList.remove("cross");
+            document.getElementById("nomTick").classList.add("tick");
+        }
+    }
+    return valid;
+  }
+    function validateNom(input) {
+    var nom = input.value;
+        var regex_nom = /^[a-zA-Z]{4,15}(\s[a-zA-Z]{4,15})?$/;
+        if (!regex_nom.test(nom)) {
+        input.setCustomValidity("Le nom doit contenir uniquement des lettres et un seul espace pour séparer le nom et le prénom, et ne doit pas dépasser 15 caractères ni être moin de 4 caractères.");
+        document.getElementById("nomTick").classList.remove("tick");
+        document.getElementById("nomTick").classList.add("cross");
+    } else {
+        input.setCustomValidity("");
+        document.getElementById("nomTick").classList.remove("cross");
+        document.getElementById("nomTick").classList.add("tick");
+    }
+}
+</script>
  <?php
  // create event
  $client = null;
@@ -102,7 +171,7 @@
  $clientC = new clientC();
  if (
      isset($_POST["nom"]) && 
-      isset($_POST["numtel"]) && 
+     isset($_POST["numtel"]) && 
      isset($_POST["email"]) &&
      isset($_POST["adresse"]) && 
      isset($_POST["mdp"])
@@ -131,5 +200,5 @@
 
  
 }
-
+ob_flush();
 ?>

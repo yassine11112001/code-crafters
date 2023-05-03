@@ -3,33 +3,37 @@ include_once '../../Model/client.php';
 include_once '../../Controller/clientC.php';
 $clientC = new clientC();
 
-if (isset($_POST['nom'])&&
-isset($_POST['adresse'])&&
-isset($_POST['email'])&&
-isset($_POST['numtel'])&&
-isset($_POST['mdp'])
-) {
-    if (!empty($_POST['nom'])&&
-    !empty($_POST['adresse'])&&
-    !empty($_POST['email'])&&
-    !empty($_POST['numtel'])&&
-    !empty($_POST['mdp'])
-    ) {
+if (isset($_POST['nom']) &&
+    isset($_POST['adresse']) &&
+    isset($_POST['email']) &&
+    isset($_POST['numtel']) &&
+    isset($_POST['mdp']) ) { 
+    //isset($_POST['role'])) {  // Modification pour vérifier le rôle sélectionné
+        if (!empty($_POST['nom']) &&
+        !empty($_POST['adresse']) &&
+        !empty($_POST['email']) &&
+        !empty($_POST['numtel']) &&
+        !empty($_POST['mdp'])) {
+        // Ajouter la date d'inscription
+        $dateInscr = date('Y-m-d H:i:s');
+        $config = 'admin';  // Valeur par défaut pour les administrateurs
+        if ($_POST['role'] == 'client') {
+            $config = 'client';
+        }
         $client = new client(
             $_POST['nom'],
             $_POST['email'],
             $_POST['numtel'],
             $_POST['adresse'],
-            $_POST['mdp']
+            $_POST['mdp'],
+            //$dateInscr,  // ajouter la date d'inscription
+            $_POST['role']  // Utiliser la valeur du formulaire pour le rôle
         );
         $clientC->ajouterClient($client);
         header('Location:login.php');
-        
-    }
-    else
+    } else
         $error = "Missing information";
 }
-
 ?>
 
  
@@ -46,29 +50,189 @@ isset($_POST['mdp'])
 
 <body>
 <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-            <div class="container px-4 px-lg-5">
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="/user/view/Front/login.php">Precedent</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/user/view/Front/index.php#about">Accueil</a></li>
-        </nav>
-    <div class="login-dark">
-        <form method="post">
-            <h2 class="sr-only">Login Form</h2>
-            <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
-            <div class="form-group"><input class="form-control" type="text" name="nom" placeholder="Nom"></div>
-			<div class="form-group"><input class="form-control" type="email" name="email" placeholder="Email"></div>
-			<div class="form-group"><input class="form-control" type="text" name="adresse" placeholder="Adresse"></div>
-			<div class="form-group"><input class="form-control" type="number" name="numtel" placeholder="Numtel"></div>
-            <div class="form-group"><input class="form-control" type="password" name="mdp" placeholder="Password"></div>
-            <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div><a href="#" class="forgot">Forgot your email or password?</a></form>
+    <div class="container px-4 px-lg-5">
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/view/Front/login.php">
+                        <span class="arrow">&#60;</span> <span class="text">Precedent</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
-</body>
+</nav>
 
+
+<div class="login-dark">
+    <form method="post" onsubmit="return validateForm();">
+        <h2 class="sr-only">Login Form</h2>
+        <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
+
+        <div class="form-group">
+            <input class="form-control" type="text" name="nom" placeholder="Nom" onkeyup="validateNom(this)">
+            <span id="nomError" class="error-message"></span>
+            <span id="nomTick" class="tick"></span>
+        </div>
+        <div class="form-group">
+             <input class="form-control" type="email" name="email" placeholder="Email" onkeyup="validateEmail(this)">
+             <span id="emailError" class="error-message"></span>
+             <span id="emailTick" class="tick"></span>
+        </div>
+        <div class="form-group"><input class="form-control" type="text" name="adresse" placeholder="Adresse"></div>
+        <div class="form-group">
+              <input class="form-control" type="number" name="numtel" placeholder="Numtel" onkeyup="validateNumtel(this)">
+              <span id="numtelError" class="error-message"></span>
+              <span id="numtelTick" class="tick"></span>
+        </div>
+        <div class="form-group"><input class="form-control" type="password" name="mdp" placeholder="Password"></div>
+        <div class="form-group">
+            <select class="form-control" name="role">
+                <option value="client" selected>Client</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
+    </form>
+</div>
+
+<style>
+.error-message {
+        color: red;
+    }
+
+    .tick:before {
+        content: "✔";
+        color: green;
+        float: right;
+        position: relative;
+        top: -22px;
+        right: -14px
+    }
+
+    .cross:before {
+        content: "✘";
+        color: red;
+        float: right;
+        position: relative;
+        top: -22px;
+        right: -14px
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    function validateForm() {
+        var valid = true;
+        
+        var numtel = document.forms[0]["numtel"].value;
+        if (isNaN(numtel) || numtel.length != 8) {
+            document.getElementById("numtelError").innerHTML = "Le numéro de téléphone doit être un nombre de 8 chiffres.";
+            document.getElementById("numtelTick").classList.remove("tick");
+            document.getElementById("numtelTick").classList.add("cross");
+            valid = false;
+        } else {
+            document.getElementById("numtelError").innerHTML = "";
+            document.getElementById("numtelTick").classList.remove("cross");
+            document.getElementById("numtelTick").classList.add("tick");
+        }
+        
+        var email = document.forms[0]["email"].value;
+        var regex = /^\S+@\S+\.\S+$/;
+        if (!regex.test(email)) {
+            document.getElementById("emailError").innerHTML = "L'adresse email doit être valide.";
+            document.getElementById("emailTick").classList.remove("tick");
+            document.getElementById("emailTick").classList.add("cross");
+        valid = false;
+    } else {
+        document.getElementById("emailError").innerHTML = "";
+        document.getElementById("emailTick").classList.remove("cross");
+        document.getElementById("emailTick").classList.add("tick");
+    }
+    
+    var nom = document.forms[0]["nom"].value;
+        var regex_nom = /^[a-zA-Z]{1,20}(\s[a-zA-Z]{1,20})?$/;
+        if (!regex_nom.test(nom)) {
+        document.getElementById("nomError").innerHTML = "Le nom ne doit pas être vide.";
+        document.getElementById("nomTick").classList.remove("tick");
+        document.getElementById("nomTick").classList.add("cross");
+        valid = false;
+    } else {
+        document.getElementById("nomError").innerHTML = "";
+        document.getElementById("nomTick").classList.remove("cross");
+        document.getElementById("nomTick").classList.add("tick");
+    }
+    
+    return valid;
+}
+function validateNom(input) {
+    var nom = input.value;
+        var regex_nom = /^[a-zA-Z]{1,20}(\s[a-zA-Z]{1,20})?$/;
+        if (!regex_nom.test(nom)) {
+        input.setCustomValidity("Le nom doit contenir uniquement des lettres et un seul espace pour séparer le nom et le prénom, et ne doit pas dépasser 20 caractères.");
+        document.getElementById("nomTick").classList.remove("tick");
+        document.getElementById("nomTick").classList.add("cross");
+    } else {
+        input.setCustomValidity("");
+        document.getElementById("nomTick").classList.remove("cross");
+        document.getElementById("nomTick").classList.add("tick");
+    }
+}
+
+function validateEmail(input) {
+    var regex = /^\S+@\S+\.\S+$/;
+    if (!regex.test(input.value)) {
+        input.setCustomValidity("L'adresse email doit être valide.");
+        document.getElementById("emailTick").classList.remove("tick");
+        document.getElementById("emailTick").classList.add("cross");
+    } else {
+        input.setCustomValidity("");
+        document.getElementById("emailTick").classList.remove("cross");
+        document.getElementById("emailTick").classList.add("tick");
+    }
+}
+
+function validateNumtel(input) {
+    if (isNaN(input.value) || input.value.length != 8) {
+        input.setCustomValidity("Le numéro de téléphone doit être un nombre de 8 chiffres.");
+        document.getElementById("numtelTick").classList.remove("tick");
+        document.getElementById("numtelTick").classList.add("cross");
+    } else {
+        input.setCustomValidity("");
+        document.getElementById("numtelTick").classList.remove("cross");
+        document.getElementById("numtelTick").classList.add("tick");
+    }
+}
+
+
+
+
+</script>
+
+</body>
 </html>
 <style>
+.navbar-nav .nav-item .nav-link {
+    position: relative;
+    left: -200px;
+    color: rgba(128, 128, 128, 0.5);
+    background-color: transparent;
+    border: 2px solid rgba(128, 128, 128, 0.5);
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+}
+.navbar-nav .nav-item .nav-link .arrow {
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: inherit;
+    text-shadow: none;
+}
+.navbar-nav .nav-item .nav-link .text {
+    display: inline-block;
+}
+
     .navbar > .container,
     .navbar > .container-fluid,
     .navbar > .container-sm,
@@ -139,8 +303,7 @@ body {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 #mainNav .nav-link {
-    transition: none;
-    padding: 2rem 1.5rem;
+    background-color: rgb(183 192 199 / 39%);
     color: rgba(26, 26, 26, 20);
   }
 /******************************************/

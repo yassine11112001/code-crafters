@@ -7,35 +7,31 @@ session_start();
 $clientC = new clientC();
 $adminC = new adminC();
 if (
-isset($_POST['email'])&&
-isset($_POST['mdp'])
+    isset($_POST['email']) &&
+    isset($_POST['mdp'])
 ) {
     if (
-    !empty($_POST['email'])&&
-    
-    !empty($_POST['mdp'])
+        !empty($_POST['email']) &&
+        !empty($_POST['mdp'])
     ) {
-        
-        $liste=$clientC->searchLogin(($_POST['email']),($_POST['mdp']));
-        $listeA=$adminC->searchLogin(($_POST['email']),($_POST['mdp']));
-        foreach($liste as $cl)
-        {
-            $clientC->setConn(($_POST['email']),($_POST['mdp']));
+        $liste = $clientC->searchLogin($_POST['email'], $_POST['mdp']);
+        $listeA = $adminC->searchLogin($_POST['email'], $_POST['mdp']);
+
+        if (count($liste) > 0) {
+            // L'utilisateur est client
+            $client = $liste[0];
             $_SESSION['e'] = $_POST["email"];
-
-            header('Location: index.php');
-        }
-        foreach($listeA as $ad)
-        {
-            $adminC->setConn(($_POST['email']),($_POST['mdp']));
-            $_SESSION['e'] = $_POST["email"];
-
-            header('Location:../Back/affichageClient.php');
-        }
-        
-        
-    }}
-
+            if ($client['role'] === 'client') {
+                header('Location: indexclient.php');
+                $_SESSION['id'] = $client['id']; //Récupérer l'ID de l'utilisateur
+            } elseif ($client['role'] === 'admin') {
+                header('Location: ../Front/indexadmin.php');
+            } else {
+                echo "Rôle invalide pour cet utilisateur";
+            }
+        } 
+    }
+}
 ?>
  <!DOCTYPE html>
 <html>
@@ -50,24 +46,15 @@ isset($_POST['mdp'])
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-            <div class="container px-4 px-lg-5">
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="/user/view/Front/index.php">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/user/view/Front/index.php#about">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/user/view/Front/index.php#projects">Projects</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/user/view/Front/index.php#signup">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="lamainverte.html">Produit</a></li>
-                        <li class="nav-item"><a class="nav-link" href="lamainverte1.html">News</a></li>
-        </nav>
     <div class="login-dark">
         <form method="post">
             <h2 class="sr-only">Login Form</h2>
             <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
             <div class="form-group"><input class="form-control" type="email" name="email" placeholder="Email"></div>
             <div class="form-group"><input class="form-control" type="password" name="mdp" placeholder="Password"></div>
-            <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div><a href="inscription.php" class="forgot">Create your account</a></form>
+            <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div>
+            <a href="/user/view/Front/forgot_password.php" class="forgot">Mot de passe oublier</a>
+            <a href="inscription.php" class="forgot">Create your account</a></form>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>

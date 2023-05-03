@@ -2,13 +2,24 @@
 
 include_once '../../Model/client.php';
 include_once '../../Controller/clientC.php';
+session_start();
+$clientC = new clientC();
+$client = $clientC->searchById($_SESSION['id']);
+if (!$client) {
+    // User not found in database, logout and redirect to login page
+    session_unset();
+    session_destroy();
+    header('Location: login.php');
+    exit();
+}
+
 $clientC = new clientC();
 $listeC = $clientC->afficherClient();
 
 $clientC = new clientC();
 if (
     isset($_POST["nom"]) && 
-     isset($_POST["numtel"]) && 
+    isset($_POST["numtel"]) && 
     isset($_POST["email"]) &&
     isset($_POST["adresse"]) &&
     isset($_POST["mdp"]) 
@@ -80,7 +91,8 @@ body {
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>SB Admin 2 - Tables</title>
+        <title>LA MAIN VERTE</title>
+        <link rel="icon" type="image/x-icon" href="/user/view/Front/assets/favicon.ico" />
 
         <!-- Custom fonts for this template -->
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -105,11 +117,11 @@ body {
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/user/view/Front/indexclient.html">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+                <div class="sidebar-brand-text mx-3">SB client <sup>2</sup></div>
             </a>
 
             <!-- Divider -->
@@ -142,18 +154,18 @@ body {
             <!-- Nav Item - Pages Collapse Menu -->
          
 
-            <!-- Nav Item - Charts -->
+            <!-- Nav Item - Charts 
             <li class="nav-item active">
                 <a class="nav-link" href="affichageAdmin.php">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Admin</span></a>
-            </li>
+            </li>-->
 
             <!-- Nav Item - Tables -->
             <li class="nav-item ">
                 <a class="nav-link" href="affichageClient.php">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Clients</span></a>
+                    <span>Client</span></a>
             </li>
 
             <!-- Divider -->
@@ -166,7 +178,7 @@ body {
             <script>
             function redirectToPhpFile() 
             {
-            window.location.href = "/user/view/Front/index.php";
+            window.location.href = "/user/view/Front/indexclient.php";
             }
             </script>
 
@@ -394,9 +406,9 @@ body {
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Affichage Admin</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Vos informations:</h6>
                         </div>
-                        <div class="card-body">
+                       <!-- <div class="card-body">
                             <div class="table-responsive">
                                     <thead>
              <form method="POST" action="affichageClient.php">
@@ -410,7 +422,7 @@ body {
               
             </select>
               <input type="submit" class="button" value="search" name="search" /></form>
-            </div>
+            </div>-->
           </div>
           
           <!-- End Box Head -->
@@ -427,7 +439,7 @@ body {
                 <th>Email</th>
                 <th>Numtel</th>
                 <th>Adresse</th>
-                
+                <th>Mdp</th>
               
                
               </tr>
@@ -446,6 +458,7 @@ body {
                 <td><?php echo $client['email']; ?></td>
                 <td><?php echo $client['numtel']; ?></td>
                 <td><?php echo $client['adresse']; ?></td>
+                <td><?php echo $client['mdp']; ?></td>
                
                 <td><a href="supprimerClient.php?id=<?php echo $client['id']; ?>" class="ico del">Delete</a> </td>
                 <td> <a href="modifierClient.php?id=<?php echo $client['id']; ?>" class="ico edit">Edit</a>
@@ -481,7 +494,7 @@ body {
       <!-- End Content -->
       <!-- Sidebar -->
       <div id="sidebar">
-        <!-- Box -->  <div class="sort">
+        <!-- Box   <div class="sort">
               <form method="POST"><label>Sort by</label>
               <select name="tri" class="field" >
               
@@ -491,7 +504,7 @@ body {
                 
               </select><input type="submit"  value="trier"></form>
               
-            </div>
+            </div>-->
        
       <!-- End Sidebar -->
       <div class="cl">&nbsp;</div>

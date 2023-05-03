@@ -1,15 +1,15 @@
 <link rel="stylesheet" href="style.css" type="text/css" media="all" />
 <?php
- include_once '../../Controller/adminC.php';
+ include_once '../../Controller/clientC.php';
  
- $co = new adminC();
+ $co = new clientC();
  if(isset($_GET['id'])){
-   $adminC = new adminC();
-   $listeC = $adminC->afficherAdminDetail($_GET['id']);
+   $clientC = new clientC();
+   $listeC = $clientC->afficherClientDetail($_GET['id']);
  
- foreach($listeC as $admin){
+ foreach($listeC as $client){
  ?>
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -41,7 +41,7 @@
             <div class="card-body p-0">
                 <!-- Nested Row within Card Body -->
                 <div class="row">
-                    <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                    <!--<div class="col-lg-5 d-none d-lg-block bg-register-image"></div> -->
                     <div class="col-lg-7">
                         <div class="p-5">
                             <div class="text-center">
@@ -57,19 +57,26 @@
             <!-- Form -->
             <div class="container">
               <p> 
-               
                 <label>Nom </label>
-                <input type="text"  class="form-control form-control-user" name="nom" value=<?php echo $admin['nom'];?> />
+                <input type="text" class="form-control form-control-user" name="nom" value=<?php echo $client['nom'];?> />
               </p>
-             
+              <p> 
+                <label>Numtel </label>
+                <input type="number" class="form-control form-control-user" name="numtel" value=<?php echo $client['numtel'];?> />
+              </p>
+
+
               <p> 
                 <label>Email </label>
-                <input type="email"  class="form-control form-control-user" name="email" value=<?php echo $admin['email'];?> />
+                <input type="email" class="form-control form-control-user" name="email" value=<?php echo $client['email'];?> />
               </p>
-              
+              <p> 
+                <label>Adresse </label>
+                <input type="text" class="form-control form-control-user" name="adresse" value=<?php echo $client['adresse'];?> />
+              </p>
               <p> 
                 <label>Mot de passe </label>
-                <input type="text"  class="form-control form-control-user" name="mdp" value=<?php echo $admin['mdp'];}?> />
+                <input type="text" class="form-control form-control-user" name="mdp" value=<?php echo $client['mdp'];}?> />
               </p>
 
              
@@ -89,27 +96,32 @@
  </body>
  <?php
  // create event
- $admin = null;
+ $client = null;
 
  // create an instance of the controller
-
- $adminC = new adminC();
+ $clientC = new clientC();
  if (
      isset($_POST["nom"]) && 
+      isset($_POST["numtel"]) && 
      isset($_POST["email"]) &&
+     isset($_POST["adresse"]) && 
      isset($_POST["mdp"])
  ) {
      if (
          !empty($_POST["nom"]) && 
+         !empty($_POST["numtel"]) && 
          !empty($_POST["email"]) &&
+         !empty($_POST["adresse"]) &&
          !empty($_POST["mdp"]) 
      ) {
-         $admin = new admin(
+         $client = new client(
              $_POST['nom'],
              $_POST['email'],
+             $_POST['numtel'],
+             $_POST['adresse'],
              $_POST['mdp']
          );
-        $adminC->modifierAdmin($_GET['id'],$admin);
+        $clientC->modifierClient($_GET['id'],$client);
          
          header('Location:affichageAdmin.php');
      }
